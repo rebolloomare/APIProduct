@@ -7,6 +7,7 @@
 package omare.com.mx.producto.service;
 
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,11 @@ public class ProductoServiceImpl implements ProductoService {
 	 * omare.com.mx.producto.service.ProductoService#save(omare.com.mx.producto.model.Producto)
 	 */
 	@Override
-	public void save(Producto producto) {
+	public Producto save(Producto producto) {
 		logger.info("ProductoServiceImpl: inicia save");
-		productoRepository.save(producto);
+		Producto newProducto = productoRepository.save(producto);
 		logger.info("ProductoServiceImpl: termina save");
+		return newProducto;
 	}
 
 	/*
@@ -79,6 +81,19 @@ public class ProductoServiceImpl implements ProductoService {
 		productoRepository.deleteById(id);
 		logger.info("ProductoServiceImpl: termina delete");
 
+	}
+
+	/*
+	 * La documentación de este método se encuentra en la clase o interface que lo declara
+	 * (non-Javadoc)
+	 * @see omare.com.mx.producto.service.ProductoService#getProductoById(java.lang.String)
+	 */
+	@Override
+	public Optional<Producto> getProductoById(String id) {
+		logger.info("ProductoServiceImpl: inicia delete");
+		Optional<Producto> producto = productoRepository.findById(id);
+		logger.info("ProductoServiceImpl: termina delete");
+		return producto;
 	}
 
 }

@@ -7,6 +7,7 @@
 package omare.com.mx.producto.service;
 
 import java.util.List;
+import java.util.Optional;
 import omare.com.mx.producto.model.Producto;
 
 /**
@@ -23,7 +24,7 @@ public interface ProductoService {
 	 * @param producto
 	 * @return
 	 */
-	void save(Producto producto);
+	Producto save(Producto producto);
 
 	/**
 	 * TODO [Agregar documentacion al método]
@@ -46,5 +47,13 @@ public interface ProductoService {
 	 * @param id
 	 */
 	void delete(String id);
+
+	/**
+	 * TODO [Agregar documentacion al método]
+	 * @author Omar Rebollo (omar.rebollo@gmail.com)
+	 * @param id
+	 * @return
+	 */
+	Optional<Producto> getProductoById(String id);
 
 }
