@@ -1,14 +1,8 @@
 /**
- * ProductoServiceImpl.java
- * Fecha de creación: 22/10/2020, 05:13:02 PM
- *
- * Copyright (c) 2020 3LineDevelopment 
- * Todos los derechos reservados.
- *
- * Este software es información confidencial, propiedad de
- * 3LineDevelopment. Esta información confidencial
- * no deberá ser divulgada y solo se podrá utilizar de acuerdo
- * a los términos que determine la propia empresa.
+ * ProductoServiceImpl.java Fecha de creación: 22/10/2020, 05:13:02 PM Copyright (c) 2020
+ * 3LineDevelopment Todos los derechos reservados. Este software es información confidencial,
+ * propiedad de 3LineDevelopment. Esta información confidencial no deberá ser divulgada y solo
+ * se podrá utilizar de acuerdo a los términos que determine la propia empresa.
  */
 package omare.com.mx.producto.service;
 
@@ -24,56 +18,67 @@ import omare.com.mx.producto.repository.ProductoRepository;
  * TODO [Agregar documentacion de la clase]
  * @author Omar Rebollo (omar.rebollo@gmail.com)
  * @version 1.0
- * @since 
+ * @since
  */
 @Service
 public class ProductoServiceImpl implements ProductoService {
-	
+
 	private final Logger logger = LoggerFactory.getLogger(ProductoServiceImpl.class);
-	
+
 	@Autowired
 	private ProductoRepository productoRepository;
 
-	/* La documentación de este método se encuentra en la clase o interface que
-	 * lo declara  (non-Javadoc)
-	 * @see omare.com.mx.producto.service.ProductoService#save(omare.com.mx.producto.model.Producto)
+	/*
+	 * La documentación de este método se encuentra en la clase o interface que lo declara
+	 * (non-Javadoc)
+	 * @see
+	 * omare.com.mx.producto.service.ProductoService#save(omare.com.mx.producto.model.Producto)
 	 */
 	@Override
-	public int save(Producto producto) {
-		logger.info("inicia service: registra producto");
+	public void save(Producto producto) {
+		logger.info("ProductoServiceImpl: inicia save");
 		productoRepository.save(producto);
-		logger.info("termina service: registra producto");
-		return 1;
+		logger.info("ProductoServiceImpl: termina save");
 	}
 
-	/* La documentación de este método se encuentra en la clase o interface que
-	 * lo declara  (non-Javadoc)
+	/*
+	 * La documentación de este método se encuentra en la clase o interface que lo declara
+	 * (non-Javadoc)
 	 * @see omare.com.mx.producto.service.ProductoService#getProducto(java.lang.String)
 	 */
 	@Override
-	public Producto getProducto(String nombre) {
-		return null;
-		// TODO [codificar el cuerpo del método]
+	public List<Producto> getProducto(String nombre) {
+		logger.info("ProductoServiceImpl: inicia getProducto");
+		List<Producto> productos = productoRepository.findByNombre(nombre);
+		logger.info("ProductoServiceImpl: termina getProducto");
+		return productos;
 	}
 
-	/* La documentación de este método se encuentra en la clase o interface que
-	 * lo declara  (non-Javadoc)
+	/*
+	 * La documentación de este método se encuentra en la clase o interface que lo declara
+	 * (non-Javadoc)
 	 * @see omare.com.mx.producto.service.ProductoService#getAllProducts()
 	 */
 	@Override
 	public List<Producto> getAllProducts() {
-		return null;
-		// TODO [codificar el cuerpo del método]
+		logger.info("ProductoServiceImpl: inicia getAllProducts");
+		List<Producto> products = productoRepository.findAll();
+		logger.info("ProductoServiceImpl: termina getAllProducts");
+		return products;
 	}
 
-	/* La documentación de este método se encuentra en la clase o interface que
-	 * lo declara  (non-Javadoc)
-	 * @see omare.com.mx.producto.service.ProductoService#delete(omare.com.mx.producto.model.Producto)
+	/*
+	 * La documentación de este método se encuentra en la clase o interface que lo declara
+	 * (non-Javadoc)
+	 * @see
+	 * omare.com.mx.producto.service.ProductoService#delete(omare.com.mx.producto.model.Producto)
 	 */
 	@Override
-	public int delete(Producto producto) {
-		return 0;
-		// TODO [codificar el cuerpo del método]
+	public void delete(String id) {
+		logger.info("ProductoServiceImpl: inicia delete");
+		productoRepository.deleteById(id);
+		logger.info("ProductoServiceImpl: termina delete");
+
 	}
 
 }
