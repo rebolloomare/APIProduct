@@ -70,19 +70,22 @@ public class ProductoAPI {
 	public ResponseEntity<Producto> obtieneProductoById(@PathVariable("id") String id) {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getAllProducts");
-		Optional<Producto> producto = productoService.getProductoById(id);
-		if (producto.isPresent()) {
+		try {
+			Optional<Producto> producto = productoService.getProductoById(id);
+			if (producto.isPresent()) {
+				return new ResponseEntity<>(producto.get(), HttpStatus.OK);
+			} else {
+				throw new ProductoNotFoundException("producto: " + producto);
+			}
+		} catch(ProductoNotFoundException ex) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		} catch(Exception ex) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
 			final long end = System.nanoTime();
 			logger.info("time: " + ((end - start) / 1000000) + " ms");
 			logger.info("time: " + ((end - start) / 1000000000) + " seconds");
 			logger.info("ProductoAPI: Termina getAllProducts");
-			return new ResponseEntity<>(producto.get(), HttpStatus.OK);
-		} else {
-			final long end = System.nanoTime();
-			logger.info("time: " + ((end - start) / 1000000) + " ms");
-			logger.info("time: " + ((end - start) / 1000000000) + " seconds");
-			logger.info("ProductoAPI: Termina getAllProducts");
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -126,9 +129,11 @@ public class ProductoAPI {
 		try {
 			List<Producto> products = productoService.getProducto(nombre);
 			if (products.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				throw new ProductoNotFoundException("products: " + products);
 			}
 			return new ResponseEntity<>(products, HttpStatus.OK);
+		} catch(ProductoNotFoundException ex) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		} catch(Exception ex) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
@@ -147,10 +152,12 @@ public class ProductoAPI {
 			Optional<Producto> producto = productoService.getProductoById(id);
 			if (producto.isPresent()) {
 				productoService.delete(id);
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				throw new ProductoNotFoundException("products: " + producto);
 			}
+		} catch(ProductoNotFoundException ex) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		} catch(Exception ex) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
@@ -172,8 +179,10 @@ public class ProductoAPI {
 				productoService.save(newProducto);
 				return new ResponseEntity<>(newProducto, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>(newProducto, HttpStatus.NOT_FOUND);
+				throw new ProductoNotFoundException("products: " + producto);
 			}
+		} catch(ProductoNotFoundException ex) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		} catch(Exception ex) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
