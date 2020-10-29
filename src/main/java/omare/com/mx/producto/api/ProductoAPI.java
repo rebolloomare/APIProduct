@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import omare.com.mx.producto.exceptions.ProductoNotFoundException;
 import omare.com.mx.producto.model.Producto;
 import omare.com.mx.producto.service.ProductoService;
 
@@ -91,15 +92,25 @@ public class ProductoAPI {
 	 * @return
 	 */
 	@GetMapping("/obtieneProductos")
-	public List<Producto> getAllProducts() {
+	public ResponseEntity<List<Producto>> getAllProducts() {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getAllProducts");
-		List<Producto> products = productoService.getAllProducts();
-		final long end = System.nanoTime();
-		logger.info("time: " + ((end - start) / 1000000) + " ms");
-		logger.info("time: " + ((end - start) / 1000000000) + " seconds");
-		logger.info("ProductoAPI: Termina getAllProducts");
-		return products;
+		try {
+			List<Producto> products = productoService.getAllProducts();
+			if (products.isEmpty()) {
+				throw new ProductoNotFoundException("products: " + products);
+			}
+			return new ResponseEntity<>(products, HttpStatus.OK);
+		} catch(ProductoNotFoundException ex) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		} catch(Exception ex) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
+			final long end = System.nanoTime();
+			logger.info("time: " + ((end - start) / 1000000) + " ms");
+			logger.info("time: " + ((end - start) / 1000000000) + " seconds");
+			logger.info("ProductoAPI: Termina getAllProducts");
+		}
 	}
 
 	/**
@@ -109,24 +120,40 @@ public class ProductoAPI {
 	 * @return
 	 */
 	@GetMapping("/obtieneProducto/{nombre}")
-	public List<Producto> getProduct(@PathVariable String nombre) {
+	public ResponseEntity<List<Producto>> getProducto(@PathVariable String nombre) {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getProduct");
-		List<Producto> productos = productoService.getProducto(nombre);
-		final long end = System.nanoTime();
-		logger.info("time: " + ((end - start) / 1000000) + " ms");
-		logger.info("time: " + ((end - start) / 1000000000) + " seconds");
-		logger.info("ProductoAPI: termina getProduct");
-		return productos;
+		try {
+			List<Producto> products = productoService.getProducto(nombre);
+			if (products.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(products, HttpStatus.OK);
+		} catch(Exception ex) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
+			final long end = System.nanoTime();
+			logger.info("time: " + ((end - start) / 1000000) + " ms");
+			logger.info("time: " + ((end - start) / 1000000000) + " seconds");
+			logger.info("ProductoAPI: termina getProduct");
+		}
 	}
 
 	@DeleteMapping("/eliminaProducto/{id}")
-	public void deleteProducto(@PathVariable String id) {
+	public ResponseEntity<HttpStatus> deleteProducto(@PathVariable String id) {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getProduct");
-		Optional<Producto> producto = productoService.getProductoById(id);
-		if (producto.isPresent()) {
-			productoService.delete(id);
+		try {
+			Optional<Producto> producto = productoService.getProductoById(id);
+			if (producto.isPresent()) {
+				productoService.delete(id);
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch(Exception ex) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
 			final long end = System.nanoTime();
 			logger.info("time: " + ((end - start) / 1000000) + " ms");
 			logger.info("time: " + ((end - start) / 1000000000) + " seconds");
@@ -135,16 +162,25 @@ public class ProductoAPI {
 	}
 
 	@PutMapping("/actualizaProducto/{id}")
-	public void updateProducto(@PathVariable String id, @RequestBody Producto newProducto) {
+	public ResponseEntity<Producto> updateProducto(@PathVariable String id,
+		@RequestBody Producto newProducto) {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia updateProducto");
-		Optional<Producto> producto = productoService.getProductoById(id);
-		if (producto.isPresent()) {
-			productoService.save(newProducto);
+		try {
+			Optional<Producto> producto = productoService.getProductoById(id);
+			if (producto.isPresent()) {
+				productoService.save(newProducto);
+				return new ResponseEntity<>(newProducto, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(newProducto, HttpStatus.NOT_FOUND);
+			}
+		} catch(Exception ex) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
 			final long end = System.nanoTime();
 			logger.info("time: " + ((end - start) / 1000000) + " ms");
 			logger.info("time: " + ((end - start) / 1000000000) + " seconds");
-			logger.info("ProductoAPI: termina updateProducto");
+			logger.info("ProductoAPI: Termina registraProducto");
 		}
 	}
 
