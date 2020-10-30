@@ -66,7 +66,7 @@ public class ProductoAPI {
 		}
 	}
 
-	@GetMapping("/obtieneProducto/{id}")
+	@GetMapping("/obtieneProductoPorId/{id}")
 	public ResponseEntity<Producto> obtieneProductoById(@PathVariable("id") String id) {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getAllProducts");
@@ -122,7 +122,7 @@ public class ProductoAPI {
 	 * @param nombre
 	 * @return
 	 */
-	@GetMapping("/obtieneProducto/{nombre}")
+	@GetMapping("/obtieneProductoPorNombre/{nombre}")
 	public ResponseEntity<List<Producto>> getProducto(@PathVariable String nombre) {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getProduct");
@@ -176,6 +176,10 @@ public class ProductoAPI {
 		try {
 			Optional<Producto> producto = productoService.getProductoById(id);
 			if (producto.isPresent()) {
+				Producto product = producto.get();
+				product.setNombre(newProducto.getNombre());
+				product.setDescripcion(newProducto.getDescripcion());
+				product.setTipo(newProducto.getTipo());
 				productoService.save(newProducto);
 				return new ResponseEntity<>(newProducto, HttpStatus.OK);
 			} else {
