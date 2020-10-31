@@ -11,6 +11,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,13 +69,25 @@ public class ProductoAPI {
 	}
 
 	@GetMapping("/obtieneProductoPorId/{id}")
-	public ResponseEntity<Producto> obtieneProductoById(@PathVariable("id") String id) {
+	public ResponseEntity<EntityModel<Optional<Producto>>> obtieneProductoById(
+		@PathVariable("id") String id) {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getAllProducts");
 		try {
 			Optional<Producto> producto = productoService.getProductoById(id);
 			if (producto.isPresent()) {
-				return new ResponseEntity<>(producto.get(), HttpStatus.OK);
+
+				EntityModel<Optional<Producto>> resource = EntityModel.of(producto);
+
+				WebMvcLinkBuilder linkToJson = WebMvcLinkBuilder
+					.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllProductsJson());
+				resource.add(linkToJson.withRel("all-products-json"));
+
+				WebMvcLinkBuilder linkToXml =
+					WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).getAllProductsXml());
+				resource.add(linkToXml.withRel("all-products-xml"));
+
+				return new ResponseEntity<>(resource, HttpStatus.OK);
 			} else {
 				throw new ProductoNotFoundException("producto: " + producto);
 			}
@@ -94,8 +108,35 @@ public class ProductoAPI {
 	 * @author Omar Rebollo (omar.rebollo@gmail.com)
 	 * @return
 	 */
-	@GetMapping("/obtieneProductos")
-	public ResponseEntity<List<Producto>> getAllProducts() {
+	@GetMapping("/obtieneProductosxml")
+	public ResponseEntity<List<Producto>> getAllProductsXml() {
+		final long start = System.nanoTime();
+		logger.info("ProductoAPI: inicia getAllProducts");
+		try {
+			List<Producto> products = productoService.getAllProducts();
+			if (products.isEmpty()) {
+				throw new ProductoNotFoundException("products: " + products);
+			}
+			return new ResponseEntity<>(products, HttpStatus.OK);
+		} catch(ProductoNotFoundException ex) {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		} catch(Exception ex) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		} finally {
+			final long end = System.nanoTime();
+			logger.info("time: " + ((end - start) / 1000000) + " ms");
+			logger.info("time: " + ((end - start) / 1000000000) + " seconds");
+			logger.info("ProductoAPI: Termina getAllProducts");
+		}
+	}
+
+	/**
+	 * TODO [Agregar documentacion al método]
+	 * @author Omar Rebollo (omar.rebollo@gmail.com)
+	 * @return
+	 */
+	@GetMapping(path = "/obtieneProductosjson")
+	public ResponseEntity<List<Producto>> getAllProductsJson() {
 		final long start = System.nanoTime();
 		logger.info("ProductoAPI: inicia getAllProducts");
 		try {

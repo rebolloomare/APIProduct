@@ -72,8 +72,8 @@ public class ProductoServiceImpl implements ProductoService {
 	/*
 	 * La documentación de este método se encuentra en la clase o interface que lo declara
 	 * (non-Javadoc)
-	 * @see
-	 * omare.com.mx.producto.service.ProductoService#delete(omare.com.mx.producto.model.Producto)
+	 * @see omare.com.mx.producto.service.ProductoService#delete(omare.com.mx.producto.model.
+	 * Producto)
 	 */
 	@Override
 	public void delete(String id) {
